@@ -8,6 +8,7 @@ public class SnakeView extends JPanel {
     private static final Color SNAKE_COLOR = new Color(0, 180, 0);
     private static final Color FOOD_COLOR = Color.RED;
     private static final Color BACKGROUND_COLOR = Color.BLACK;
+    private static final Color GAME_OVER_COLOR = new Color(128, 0, 0);
 
     private JLabel scoreLabel;
     private JLabel gameStateLabel;
@@ -41,8 +42,12 @@ public class SnakeView extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
+        // Choose colors based on game state
+        Color snakeColor = model.getGameState() == SnakeModel.GameState.GAME_OVER
+                ? GAME_OVER_COLOR : SNAKE_COLOR;
+
         // Draw snake
-        g.setColor(SNAKE_COLOR);
+        g.setColor(snakeColor);
         for (Point segment : model.getSnakeBody()) {
             g.fillRect(
                     segment.x * SnakeModel.TILE_SIZE,
@@ -66,9 +71,24 @@ public class SnakeView extends JPanel {
         scoreLabel.setText("Score: " + model.getScore());
 
         if (model.getGameState() == SnakeModel.GameState.GAME_OVER) {
-            gameStateLabel.setText("Game Over! Press R to Restart");
-        } else {
-            gameStateLabel.setText("");
+            // Draw game over overlay
+            g.setColor(new Color(0, 0, 0, 128));
+            g.fillRect(0, 0, getWidth(), getHeight());
+
+            // Draw game over text
+            g.setColor(Color.WHITE);
+            g.setFont(new Font("Arial", Font.BOLD, 36));
+            String gameOverText = "GAME OVER";
+            FontMetrics fm = g.getFontMetrics();
+            int x = (getWidth() - fm.stringWidth(gameOverText)) / 2;
+            int y = getHeight() / 2;
+            g.drawString(gameOverText, x, y);
+
+            // Draw restart instructions
+            g.setFont(new Font("Arial", Font.PLAIN, 20));
+            String restartText = "Press R to Restart";
+            int restartX = (getWidth() - fm.stringWidth(restartText)) / 2;
+            g.drawString(restartText, restartX, y + 50);
         }
     }
 
